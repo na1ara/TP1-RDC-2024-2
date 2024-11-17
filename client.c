@@ -58,33 +58,42 @@ void startORmoveORreset(char possibleMoves[4]){
     }
 }
 
-void map(){
-    // imprime o mapa
-    int matriz[5][5];
-    for(int i = 0; i <= 5; i++){
-        for(int j = 0; i<=5;j++){
-            char position[5][5];
+void map(int matriz[5][5]) {
+    char position[5][5][2]; // Array para armazenar os símbolos
+
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
             int serverLAB = matriz[i][j];
-            switch (serverLAB){
-            case 1:
-                position[i][j] = "_";
-                break;
-            case 2:
-                position[i][j] = ">";
-                break;
-            case 3:
-                position[i][j] = "X";
-                break;
-            case 4:
-                position[i][j] = "?";
-                break;
-            case 5:
-                position[i][j] = "+";
-                break;
+            switch (serverLAB) {
+                case 1:
+                    strcpy(position[i][j], "_");
+                    break;
+                case 2:
+                    strcpy(position[i][j], ">");
+                    break;
+                case 3:
+                    strcpy(position[i][j], "X");
+                    break;
+                case 4:
+                    strcpy(position[i][j], "?");
+                    break;
+                case 5:
+                    strcpy(position[i][j], "+");
+                    break;
             }
         }
     }
+
+    // Exemplo de impressão do mapa
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            printf("%s ", position[i][j]);
+        }
+        printf("\n");
+    }
 }
+
+
 
 void hint(char resolucao[100]){
     printf("Hint: ");
