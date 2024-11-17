@@ -18,51 +18,21 @@ void usage(int argc, char **argv) {
 
 void start(){
     // tem que ler o labirinto do arquivo
-    // tem que imprimir a lista de movimentos validos
+    // envia a lista de movimentos validos
     printf("starting new game");
 }
 
 void move(){
-    // testar quais são os movimentos permitidos
-    //set aux variables to tell which moves are possible
-    int up = 1;
-    int right = 1;
-    int down = 1;
-    int right = 1;
-
-    printf("Possible moves: ");
-    if(up == 1){
-        if(right == 1 || down == 1 || right == 1){
-            printf("up, ");
-        }else{
-            printf("up.");
-        }
-    }
-    if(right == 1){
-        if(down == 1 || right == 1){
-            printf("right, ");
-        }else{
-            printf("right.");
-        }
-    }
-    if(down == 1){
-        if(right == 1){
-            printf("down, ");
-        }else{
-            printf("down.");
-        }
-    }
-    if(right == 1){
-        printf("right.");
-    }
+    // atualiza o estado do jogo
+    // envia a lista de movimentos validos
 }
 
 void map(){
-
+    // envia o mapa para o cliente
 }
 
 void hint(){
-
+    // envia lista de movimentos
 }
 
 void update(){
@@ -74,11 +44,13 @@ void win(){
 }
 
 void reset(){
-
+    // reseta o estado do jogo
+    printf("starting new game");
 }
 
 void exit(){
-
+    // reseta o estado do jogo
+    printf("client disconnected");
 }
 
 int main(int argc, char **argv) {

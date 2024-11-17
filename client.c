@@ -18,41 +18,114 @@ void usage(int argc, char **argv){
 	exit(EXIT_FAILURE);
 }
 
-void move(char possibleMoves[4]){
+
+void startORmoveORreset(char possibleMoves[4]){
     // testar quais são os movimentos permitidos
     //set aux variables to tell which moves are possible
-    int up = possibleMoves[0];
-    int right = possibleMoves[1];
-    int down = possibleMoves[2];
-    int right = possibleMoves[3];
-
     printf("Possible moves: ");
-    if(up == 1){
-        if(right == 1 || down == 1 || right == 1){
-            printf("up, ");
+    for(int i=0; i<strlen(possibleMoves);i++){
+        if(possibleMoves[i+1] != 0){
+            switch (possibleMoves[i]){
+            case 1:
+                printf("up, ");
+                break;
+            case 2:
+                printf("right, ");
+                break;
+            case 3:
+                printf("down, ");
+                break;
+            case 4:
+                printf("left, ");
+                break;
+            }
         }else{
-            printf("up.");
+            switch (possibleMoves[i]){
+            case 1:
+                printf("up.");
+                break;
+            case 2:
+                printf("right.");
+                break;
+            case 3:
+                printf("down.");
+                break;
+            case 4:
+                printf("left.");
+                break;
+            }
         }
-    }
-    if(right == 1){
-        if(down == 1 || right == 1){
-            printf("right, ");
-        }else{
-            printf("right.");
-        }
-    }
-    if(down == 1){
-        if(right == 1){
-            printf("down, ");
-        }else{
-            printf("down.");
-        }
-    }
-    if(right == 1){
-        printf("right.");
     }
 }
 
+void map(){
+    // imprime o mapa
+    int matriz[5][5];
+    for(int i = 0; i <= 5; i++){
+        for(int j = 0; i<=5;j++){
+            char position[5][5];
+            int serverLAB = matriz[i][j];
+            switch (serverLAB){
+            case 1:
+                position[i][j] = "_";
+                break;
+            case 2:
+                position[i][j] = ">";
+                break;
+            case 3:
+                position[i][j] = "X";
+                break;
+            case 4:
+                position[i][j] = "?";
+                break;
+            case 5:
+                position[i][j] = "+";
+                break;
+            }
+        }
+    }
+}
+
+void hint(char resolucao[100]){
+    printf("Hint: ");
+    for(int i=0; i<strlen(resolucao);i++){
+        if(resolucao[i+1] != 0){
+            switch (resolucao[i]){
+            case 1:
+                printf("up, ");
+                break;
+            case 2:
+                printf("right, ");
+                break;
+            case 3:
+                printf("down, ");
+                break;
+            case 4:
+                printf("left, ");
+                break;
+            }
+        }else{
+            switch (resolucao[i]){
+            case 1:
+                printf("up.");
+                break;
+            case 2:
+                printf("right.");
+                break;
+            case 3:
+                printf("down.");
+                break;
+            case 4:
+                printf("left.");
+                break;
+            }
+        }
+    }
+}
+
+void exit(){
+    // desconecta do servidor
+}
 
 int main(int argc, char **argv){
     if(argc < 3){
