@@ -18,43 +18,79 @@ void usage(int argc, char **argv){
 	exit(EXIT_FAILURE);
 }
 
-void logexit(const char *nsg){
-    perror(nsg); // imprime qual erro foi
-    exit(EXIT_FAILURE);
+void move(char possibleMoves[4]){
+    // testar quais são os movimentos permitidos
+    //set aux variables to tell which moves are possible
+    int up = possibleMoves[0];
+    int right = possibleMoves[1];
+    int down = possibleMoves[2];
+    int right = possibleMoves[3];
+
+    printf("Possible moves: ");
+    if(up == 1){
+        if(right == 1 || down == 1 || right == 1){
+            printf("up, ");
+        }else{
+            printf("up.");
+        }
+    }
+    if(right == 1){
+        if(down == 1 || right == 1){
+            printf("right, ");
+        }else{
+            printf("right.");
+        }
+    }
+    if(down == 1){
+        if(right == 1){
+            printf("down, ");
+        }else{
+            printf("down.");
+        }
+    }
+    if(right == 1){
+        printf("right.");
+    }
 }
 
-void main(int argc, char **argv){
+
+int main(int argc, char **argv){
     if(argc < 3){
         usage(argc, argv);
     }
 
-    int s;
-    s = socket(AF_INET, SOCK_STREAM, 0);
-    if(s == -1){
-        // teste de erro de conexão
-        logexit("socket");
-    }
 
-    // funcao conect
-    if(0 != connect(s, addr, sizeof(addr))){
-        logexit("connect");
-    }
+	struct sockaddr_storage storage;
+	if (0 != addrparse(argv[1], argv[2], &storage)) {
+		usage(argc, argv);
+	}
 
-    char addrstr[BUFSZ];
-    addrtostr(addr, addrstr, BUFSZ);
+	int s;
+	s = socket(storage.ss_family, SOCK_STREAM, 0);
+	if (s == -1) {
+        //teste de erro de conexao
+		logexit("socket");
+	}
+	struct sockaddr *addr = (struct sockaddr *)(&storage);
+	if (0 != connect(s, addr, sizeof(storage))) {
+		logexit("connect");
+	}
 
-    printf("connected to %s\n");
+	char addrstr[BUFSZ];
+	addrtostr(addr, addrstr, BUFSZ);
+
+    printf("connected to %s\n", addrstr);
 
     // comunicação cliente-servidor
     char buf[BUFSZ];
     memset(buf, 0, BUFSZ);
     printf("mensagem> ");
     // dado enviado para o servidor
-    fgets(buf, BUFSZ-1, stdin);
-    int count = send(s, buf, strlen(buf)+1, 0); //n de bits transmitido na rede
-    if(count != strlen(buf)+1){
-        logexit(send);
-    }
+	fgets(buf, BUFSZ-1, stdin);
+	size_t count = send(s, buf, strlen(buf)+1, 0); //n de bits transmitido na rede
+	if (count != strlen(buf)+1) {
+		logexit("send");
+	}
     
     memset(buf, 0, BUFSZ);
     unsigned total = 0;
