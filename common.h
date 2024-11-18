@@ -6,7 +6,7 @@
 
 typedef struct {
   int type;
-  int moves[];
+  int moves[100];
   int board[10][10];
 }action;
 
