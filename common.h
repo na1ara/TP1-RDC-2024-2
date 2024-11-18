@@ -4,6 +4,12 @@
 
 #include <arpa/inet.h>
 
+typedef struct action{
+  int type;
+  int moves[];
+  int board[10][10];
+};
+
 void logexit(const char *msg);
 
 int addrparse(const char *addrstr, const char *portstr,
