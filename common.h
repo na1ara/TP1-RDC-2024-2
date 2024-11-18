@@ -4,11 +4,11 @@
 
 #include <arpa/inet.h>
 
-typedef struct action{
+typedef struct {
   int type;
   int moves[];
   int board[10][10];
-};
+}action;
 
 void logexit(const char *msg);
 
