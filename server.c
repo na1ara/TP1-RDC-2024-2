@@ -35,8 +35,8 @@ void hint(){
     // envia lista de movimentos
 }
 
-void update(){
-
+void update(action *action){
+    //atualizar o labirinto a ser enviado
 }
 
 void win(){
@@ -48,10 +48,14 @@ void reset(){
     printf("starting new game");
 }
 
-void exit(){
-    // reseta o estado do jogo
-    printf("client disconnected");
+void possibleMoves(action *action){
+    //precisa ler o tabuleiro e dizer pra onde pode ir
 }
+
+//void exit(){
+    // reseta o estado do jogo
+//    printf("client disconnected");
+//}
 
 int main(int argc, char **argv) {
     if (argc < 3) {
@@ -89,6 +93,7 @@ int main(int argc, char **argv) {
     char addrstr[BUFSZ];
     addrtostr(addr, addrstr, BUFSZ);
     printf("bound to %s, waiting connections\n", addrstr);
+    printf("client connected\n");
 
     while (1) {
         struct sockaddr_storage cstorage;
@@ -100,22 +105,39 @@ int main(int argc, char **argv) {
         if (csock == -1) {
             logexit("accept");
         }
+        printf("socket criado\n");
 
         // caminho do arquivo tem que passar como "./server v4 51511 -i input/in.txt"
         char caddrstr[BUFSZ];
         addrtostr(caddr, caddrstr, BUFSZ);
-        printf("client connected");
+        
         //printf("[log] connection from %s\n", caddrstr);
+        while(1){
+            printf("?\n");
+            //char buf[BUFSZ];
+            //memset(buf, 0, BUFSZ);
+            action buf;
+            memset(&buf, 0, sizeof(buf));
 
-        char buf[BUFSZ];
-        memset(buf, 0, BUFSZ);
-        size_t count = recv(csock, buf, BUFSZ - 1, 0);
-        printf("[msg] %s, %d bytes: %s\n", caddrstr, (int)count, buf);
+            //recebe mensagem do cliente
+            ssize_t count = recv(csock, &buf, sizeof(buf) - 1, 0);
+            printf("[msg] %s, %d bytes: %d\n", caddrstr, (int)count, buf.type);
+            printf("a\n");
 
-        sprintf(buf, "remote endpoint: %.1000s\n", caddrstr);
-        count = send(csock, buf, strlen(buf) + 1, 0);
-        if (count != strlen(buf) + 1) {
-            logexit("send");
+            
+
+            //sprintf(&buf, "remote endpoint: %.1000s\n", caddrstr);
+            //printf("b\n");
+
+            //eh o buf que ele envia para o cliente
+            action response;
+            count = send(csock, &buf, sizeof(buf) + 1, 0);
+            printf("c\n");
+
+            if (count != sizeof(buf) + 1) {
+                logexit("send");
+            }
+
         }
         close(csock);
     }

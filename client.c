@@ -19,13 +19,13 @@ void usage(int argc, char **argv){
 }
 
 
-void startORmoveORreset(char possibleMoves[4]){
+void startORmoveORreset(action action){
     // testar quais são os movimentos permitidos
     //set aux variables to tell which moves are possible
     printf("Possible moves: ");
-    for(int i=0; i<strlen(possibleMoves);i++){
-        if(possibleMoves[i+1] != 0){
-            switch (possibleMoves[i]){
+    for(int i=0; i<100;i++){
+        if(action.moves[i+1] != 0){
+            switch (action.moves[i]){
             case 1:
                 printf("up, ");
                 break;
@@ -40,7 +40,7 @@ void startORmoveORreset(char possibleMoves[4]){
                 break;
             }
         }else{
-            switch (possibleMoves[i]){
+            switch (action.moves[i]){
             case 1:
                 printf("up.");
                 break;
@@ -58,13 +58,15 @@ void startORmoveORreset(char possibleMoves[4]){
     }
 }
 
-void map(int matriz[5][5]) {
-    char position[5][5][2]; // Array para armazenar os símbolos
+void map(action action) {
+    char position[10][10][2]; // Array para armazenar os símbolos
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
-            int serverLAB = matriz[i][j];
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            int serverLAB = action.board[i][j];
             switch (serverLAB) {
+                case 0:
+                    break;
                 case 1:
                     strcpy(position[i][j], "_");
                     break;
@@ -93,13 +95,11 @@ void map(int matriz[5][5]) {
     }
 }
 
-
-
-void hint(char resolucao[100]){
+void hint(action action){
     printf("Hint: ");
-    for(int i=0; i<strlen(resolucao);i++){
-        if(resolucao[i+1] != 0){
-            switch (resolucao[i]){
+    for(int i=0; i<100;i++){
+        if(action.moves[i+1] != 0){
+            switch (action.moves[i]){
             case 1:
                 printf("up, ");
                 break;
@@ -114,7 +114,7 @@ void hint(char resolucao[100]){
                 break;
             }
         }else{
-            switch (resolucao[i]){
+            switch (action.moves[i]){
             case 1:
                 printf("up.");
                 break;
@@ -132,9 +132,9 @@ void hint(char resolucao[100]){
     }
 }
 
-void exit(){
+//void exit(){
     // desconecta do servidor
-}
+//}
 
 int main(int argc, char **argv){
     if(argc < 3){
@@ -163,33 +163,83 @@ int main(int argc, char **argv){
 
     printf("connected to %s\n", addrstr);
 
-    // comunicação cliente-servidor
+    action action;
+    
     char buf[BUFSZ];
+    char command[BUFSZ];
     memset(buf, 0, BUFSZ);
-    printf("mensagem> ");
+    printf("mensagem de start> ");
     // dado enviado para o servidor
 	fgets(buf, BUFSZ-1, stdin);
-	size_t count = send(s, buf, strlen(buf)+1, 0); //n de bits transmitido na rede
-	if (count != strlen(buf)+1) {
-		logexit("send");
-	}
-    
-    memset(buf, 0, BUFSZ);
-    unsigned total = 0;
-    while(1){
-        // fica recebendo dados do servidor
-        // total ordena os dados dentro do buffer no caso de receber mais de 1024 bytes
-        count = recv(s, buf + total, BUFSZ-total, 0);
-        if(count == 0){
-            // só retorna 0 do recv se a conexao tiver fechada o que é um erro
-            break;
-        }
-        total += count;
+    strncpy(command, buf, BUFSZ); 
+    command[strcspn(command, "\n")] = '\0';
+    //testa pro primeiro ser obrigatoriamente um start
+    while(strcmp(command, "start") != 0){
+        printf("error: start the game first\n");
+        memset(buf, 0, BUFSZ);
+        printf("mensagem de start> ");
+        // dado enviado para o servidor
+	    fgets(buf, BUFSZ-1, stdin);
+        strncpy(command, buf, BUFSZ); 
+        command[strcspn(command, "\n")] = '\0';
     }
-    close(s);
+    // começa o jogo
+    while(1){
+        // comunicação cliente-servidor
+        //pega novo comando do cliente
+        memset(buf, 0, BUFSZ);
+        printf("mensagem de comando> ");
+        // dado enviado para o servidor
+	    fgets(buf, BUFSZ-1, stdin);
+        strncpy(command, buf, BUFSZ); 
+        command[strcspn(command, "\n")] = '\0';
 
-    printf("recebemos %u bytes\n ", total);
-    puts(buf);
+        if (strcmp(command, "up") == 0){
+            action.type = 1;
+        }else if (strcmp(command, "right") == 0){
+            action.type = 1;
+        }else if (strcmp(command, "down") == 0){
+            action.type = 1;
+        }else if (strcmp(command, "left") == 0){
+            action.type = 1;
+        }else if (strcmp(command, "map") == 0){
+            action.type = 2;
+        }else if (strcmp(command, "hint") == 0){
+            action.type = 3;
+        }else if (strcmp(command, "reset") == 0){
+            action.type = 6;
+        }else if (strcmp(command, "exit") == 0){
+            action.type = 7;
+            close(s);
+        }else{
+            printf("error: command not found\n");
+        }
+        
+
+        printf("comando selecionado ok\n");
+        size_t count = send(s, buf, strlen(buf)+1, 0); //n de bits transmitido na rede
+	    if (count != strlen(buf)+1) {
+	    	logexit("send");
+	    }
+        printf("mensagem transmitida\n");
+
+        memset(buf, 0, BUFSZ);
+        unsigned total = 0;
+        while(1){
+            printf("?\n");
+            // fica recebendo dados do servidor
+            // total ordena os dados dentro do buffer no caso de receber mais de 1024 bytes
+            count = recv(s, buf + total, BUFSZ-total, 0);
+            if(count == 0){
+                // só retorna 0 do recv se a conexao tiver fechada o que é um erro
+                break;
+            }
+            total += count;
+        }
+        printf("recebemos %u bytes\n ", total);
+        puts(buf);
+
+    }
 
     exit(EXIT_SUCCESS);
 }
