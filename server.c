@@ -35,8 +35,9 @@ void hint(){
     // envia lista de movimentos
 }
 
-void update(action *action){
+void update(action *action, int jogado[10][10]){
     //atualizar o labirinto a ser enviado
+    //recursivo da possibleMoves e vai guardando o mais a direita que pode
 }
 
 void win(){
@@ -48,8 +49,34 @@ void reset(){
     printf("starting new game");
 }
 
-void possibleMoves(action *action){
+void possibleMoves(int board[10][10], action *action){
     //precisa ler o tabuleiro e dizer pra onde pode ir
+    int[10][10] lab_env = action->board;
+    int up = 0;
+    int right = 0;
+    int down = 0;
+    int left = 0;
+    
+    for(int i=0; i<10;i++){
+        for(int j=0; j<10;j++){
+            if(lab_env[i][j]==5){ //acha o jogador
+                if(i==0 || lab_env[i-1][j] == 0 ){
+                    up == 0;
+                }
+                if(j==9 || lab_env[i][j+1] == 0){
+                    right = 0;
+                }
+                if(i==9 || lab_env[i+1][j] == 0){
+                    down = 0;
+                }
+                if(j==0 || lab_env[i][j-1] == 0){
+                    left == 0;
+                }
+            }
+        }
+    }
+
+    //falta armazenar em ordem no array
 }
 
 //void exit(){
@@ -58,6 +85,11 @@ void possibleMoves(action *action){
 //}
 
 int main(int argc, char **argv) {
+
+    // leitura do labirinto vindo do arquivo só um board
+    int board[10][10]; // labirinto INICIAL do jogo
+    int jogado[10][10] = board; // labirinto com as coisas que o jogador já descobriu 
+    
     if (argc < 3) {
         usage(argc, argv);
     }
@@ -116,7 +148,7 @@ int main(int argc, char **argv) {
             printf("?\n");
             //char buf[BUFSZ];
             //memset(buf, 0, BUFSZ);
-            action buf;
+            action buf; //mensagem recebida vinda do cliente
             memset(&buf, 0, sizeof(buf));
 
             //recebe mensagem do cliente
@@ -131,10 +163,13 @@ int main(int argc, char **argv) {
 
             //eh o buf que ele envia para o cliente
             action response;
-            count = send(csock, &buf, sizeof(buf) + 1, 0);
+
+            //precisa de um update aqui no meio do caminho
+            
+            count = send(csock, &response, sizeof(response) + 1, 0);
             printf("c\n");
 
-            if (count != sizeof(buf) + 1) {
+            if (count != sizeof(response) + 1) {
                 logexit("send");
             }
 
