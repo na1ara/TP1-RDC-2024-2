@@ -66,6 +66,7 @@ void map(action action) {
             int serverLAB = action.board[i][j];
             switch (serverLAB) {
                 case 0:
+                    strcpy(position[i][j], "#");
                     break;
                 case 1:
                     strcpy(position[i][j], "_");
@@ -86,7 +87,6 @@ void map(action action) {
         }
     }
 
-    // Exemplo de impressão do mapa
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 5; j++) {
             printf("%s ", position[i][j]);
@@ -132,6 +132,9 @@ void hint(action action){
     }
 }
 
+void invalidMove(action action){
+
+}
 
 int main(int argc, char **argv){
     if(argc < 3){
@@ -160,8 +163,9 @@ int main(int argc, char **argv){
 
     printf("connected to %s\n", addrstr);
 
-    action action;
+    action action, labServer;
     action.type = -1;
+    size_t count;
     
     char buf[BUFSZ];
     char command[BUFSZ];
@@ -170,7 +174,8 @@ int main(int argc, char **argv){
     while(1){
         // comunicação cliente-servidor
         //pega novo comando do cliente
-        memset(buf, 0, BUFSZ);
+        printf(".\n");
+        memset(&buf, 0, sizeof(buf));
 
         if(action.type<0){
             printf("mensagem de start> ");
@@ -195,16 +200,49 @@ int main(int argc, char **argv){
             strncpy(command, buf, BUFSZ); 
             command[strcspn(command, "\n")] = '\0';
 
+            int ok=0;
             if (strcmp(command, "up") == 0){
+                for(int i=0;i<4;i++){
+                    if(labServer.moves[i]==1){
+                        ok=1;
+                    }
+                }
+                if(ok==0){
+                    invalidMove(labServer);
+                }
                 action.type = 1;
                 action.moves[0] = 1;
             }else if (strcmp(command, "right") == 0){
+                for(int i=0;i<4;i++){
+                    if(labServer.moves[i]==2){
+                        ok=1;
+                    }
+                }
+                if(ok==0){
+                    invalidMove(labServer);
+                }
                 action.type = 1;
                 action.moves[0] = 2;
             }else if (strcmp(command, "down") == 0){
+                for(int i=0;i<4;i++){
+                    if(labServer.moves[i]==3){
+                        ok=1;
+                    }
+                }
+                if(ok==0){
+                    invalidMove(labServer);
+                }
                 action.type = 1;
                 action.moves[0] = 3;
             }else if (strcmp(command, "left") == 0){
+                for(int i=0;i<4;i++){
+                    if(labServer.moves[i]==4){
+                        ok=1;
+                    }
+                }
+                if(ok==0){
+                    invalidMove(labServer);
+                }
                 action.type = 1;
                 action.moves[0] = 4;
             }else if (strcmp(command, "map") == 0){
@@ -221,28 +259,41 @@ int main(int argc, char **argv){
             }
         }
 
+        printf("action type: %d\n", action.type);
         printf("comando selecionado ok\n");
-        size_t count = send(s, &action, sizeof(action)+1, 0); //n de bits transmitido na rede
-	    if (count != sizeof(action)+1) {
+        count = send(s, &action, sizeof(action), 0); //n de bits transmitido na rede
+	    if (count != sizeof(action)) {
 	    	logexit("send");
 	    }
         printf("mensagem transmitida\n");
 
-        memset(buf, 0, BUFSZ);
-        unsigned total = 0;
-        while(1){
-            printf("?\n");
-            // fica recebendo dados do servidor
-            // total ordena os dados dentro do buffer no caso de receber mais de 1024 bytes
-            count = recv(s, buf + total, BUFSZ-total, 0);
-            if(count == 0){
-                // só retorna 0 do recv se a conexao tiver fechada o que é um erro
-                break;
-            }
-            total += count;
-        }
-        printf("recebemos %u bytes\n ", total);
+        memset(&labServer, 0, sizeof(labServer));
+        count = recv(s, &labServer, sizeof(labServer), 0);
+
+        printf("response type: %d\n", labServer.type);
         puts(buf);
+
+        //tratamento pós resposta do server
+        switch(action.type){
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                map(labServer);
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+            case 6:
+                break;
+            case 7:
+                break;
+
+        }
 
     }
 
