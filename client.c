@@ -9,7 +9,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-#define BUFSZ 1024
+#define BUFSZ 2048
 
 void usage(int argc, char **argv){
     // recebe como parâmetro o IP do servidor e o porto
@@ -132,9 +132,6 @@ void hint(action action){
     }
 }
 
-//void exit(){
-    // desconecta do servidor
-//}
 
 int main(int argc, char **argv){
     if(argc < 3){
@@ -164,61 +161,69 @@ int main(int argc, char **argv){
     printf("connected to %s\n", addrstr);
 
     action action;
+    action.type = -1;
     
     char buf[BUFSZ];
     char command[BUFSZ];
-    memset(buf, 0, BUFSZ);
-    printf("mensagem de start> ");
-    // dado enviado para o servidor
-	fgets(buf, BUFSZ-1, stdin);
-    strncpy(command, buf, BUFSZ); 
-    command[strcspn(command, "\n")] = '\0';
-    //testa pro primeiro ser obrigatoriamente um start
-    while(strcmp(command, "start") != 0){
-        printf("error: start the game first\n");
-        memset(buf, 0, BUFSZ);
-        printf("mensagem de start> ");
-        // dado enviado para o servidor
-	    fgets(buf, BUFSZ-1, stdin);
-        strncpy(command, buf, BUFSZ); 
-        command[strcspn(command, "\n")] = '\0';
-    }
+	
     // começa o jogo
     while(1){
         // comunicação cliente-servidor
         //pega novo comando do cliente
         memset(buf, 0, BUFSZ);
-        printf("mensagem de comando> ");
-        // dado enviado para o servidor
-	    fgets(buf, BUFSZ-1, stdin);
-        strncpy(command, buf, BUFSZ); 
-        command[strcspn(command, "\n")] = '\0';
 
-        if (strcmp(command, "up") == 0){
-            action.type = 1;
-        }else if (strcmp(command, "right") == 0){
-            action.type = 1;
-        }else if (strcmp(command, "down") == 0){
-            action.type = 1;
-        }else if (strcmp(command, "left") == 0){
-            action.type = 1;
-        }else if (strcmp(command, "map") == 0){
-            action.type = 2;
-        }else if (strcmp(command, "hint") == 0){
-            action.type = 3;
-        }else if (strcmp(command, "reset") == 0){
-            action.type = 6;
-        }else if (strcmp(command, "exit") == 0){
-            action.type = 7;
-            close(s);
+        if(action.type<0){
+            printf("mensagem de start> ");
+            fgets(buf, BUFSZ-1, stdin);
+            strncpy(command, buf, BUFSZ); 
+            command[strcspn(command, "\n")] = '\0';
+            //testa pro primeiro ser obrigatoriamente um start
+            while(strcmp(command, "start") != 0){
+                printf("error: start the game first\n");
+                memset(buf, 0, BUFSZ);
+                printf("mensagem de start> ");
+                // dado enviado para o servidor
+	            fgets(buf, BUFSZ-1, stdin);
+                strncpy(command, buf, BUFSZ); 
+                command[strcspn(command, "\n")] = '\0';
+            }
+            action.type = 0;
         }else{
-            printf("error: command not found\n");
+            printf("mensagem de comando> ");
+            // dado enviado para o servidor
+	        fgets(buf, BUFSZ-1, stdin);
+            strncpy(command, buf, BUFSZ); 
+            command[strcspn(command, "\n")] = '\0';
+
+            if (strcmp(command, "up") == 0){
+                action.type = 1;
+                action.moves[0] = 1;
+            }else if (strcmp(command, "right") == 0){
+                action.type = 1;
+                action.moves[0] = 2;
+            }else if (strcmp(command, "down") == 0){
+                action.type = 1;
+                action.moves[0] = 3;
+            }else if (strcmp(command, "left") == 0){
+                action.type = 1;
+                action.moves[0] = 4;
+            }else if (strcmp(command, "map") == 0){
+                action.type = 2;
+            }else if (strcmp(command, "hint") == 0){
+                action.type = 3;
+            }else if (strcmp(command, "reset") == 0){
+                action.type = 6;
+            }else if (strcmp(command, "exit") == 0){
+                action.type = 7;
+                close(s);
+            }else{
+                printf("error: command not found\n");
+            }
         }
-        
 
         printf("comando selecionado ok\n");
-        size_t count = send(s, buf, strlen(buf)+1, 0); //n de bits transmitido na rede
-	    if (count != strlen(buf)+1) {
+        size_t count = send(s, &action, sizeof(action)+1, 0); //n de bits transmitido na rede
+	    if (count != sizeof(action)+1) {
 	    	logexit("send");
 	    }
         printf("mensagem transmitida\n");

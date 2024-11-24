@@ -8,7 +8,43 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#define BUFSZ 1024
+#define BUFSZ 2048
+
+void start(int board[10][10]){
+    FILE *arq = fopen("/home/naiara/TP1-RDC-2024-2/input/in.txt", "r");
+    if (!arq){
+        perror("error: file not found");
+        return;
+    }
+
+    for (int i=0;i<10;i++){
+        for (int j=0;j<10;j++){
+            board[i][j] = 0; //inicializa tudo como muro
+        }
+    }
+
+    int i=0, j=0;
+    while (!feof(arq)){
+        int num;
+        if (fscanf(arq, "%d", &num) == 1){ //pega apenas num inteiros
+            board[i][j] = num;
+            j++;
+            if (j>=10){ //pula p prox linha
+                j = 0;
+                i++;
+            }
+            if (i>=10){ //pega só o max de colunas
+                break;
+            }
+        }
+    }
+    fclose(arq);
+    printf("starting new game\n");
+
+    // tem que chamar a possiblemoves
+    //tem que chamar a update
+
+}
 
 void usage(int argc, char **argv) {
     printf("usage: %s <v4|v6> <server port>\n", argv[0]);
@@ -16,13 +52,8 @@ void usage(int argc, char **argv) {
     exit(EXIT_FAILURE);
 }
 
-void start(){
-    // tem que ler o labirinto do arquivo
-    // envia a lista de movimentos validos
-    printf("starting new game");
-}
 
-void move(){
+void move(action *action, int board[10][10]){
     // atualiza o estado do jogo
     // envia a lista de movimentos validos
 }
@@ -35,9 +66,10 @@ void hint(){
     // envia lista de movimentos
 }
 
-void update(action *action, int jogado[10][10]){
+void update(action *action, int board[10][10]){
     //atualizar o labirinto a ser enviado
     //recursivo da possibleMoves e vai guardando o mais a direita que pode
+    action->type = 4;
 }
 
 void win(){
@@ -46,12 +78,18 @@ void win(){
 
 void reset(){
     // reseta o estado do jogo
-    printf("starting new game");
+    printf("starting new game\n");
 }
 
-void possibleMoves(int board[10][10], action *action){
+void possibleMoves(action *action, int board[10][10]){
     //precisa ler o tabuleiro e dizer pra onde pode ir
-    int[10][10] lab_env = action->board;
+    int lab_env[10][10];
+    for(int i=0;i<10;i++){
+        for(int j=0;j<10;j++){
+            lab_env[i][j] = action->board[i][j];
+        }
+    }
+
     int up = 0;
     int right = 0;
     int down = 0;
@@ -60,17 +98,17 @@ void possibleMoves(int board[10][10], action *action){
     for(int i=0; i<10;i++){
         for(int j=0; j<10;j++){
             if(lab_env[i][j]==5){ //acha o jogador
-                if(i==0 || lab_env[i-1][j] == 0 ){
-                    up == 0;
+                if(i==0 || board[i-1][j] == 0 ){
+                    up = 0;
                 }
-                if(j==9 || lab_env[i][j+1] == 0){
+                if(j==9 || board[i][j+1] == 0){
                     right = 0;
                 }
-                if(i==9 || lab_env[i+1][j] == 0){
+                if(i==9 || board[i+1][j] == 0){
                     down = 0;
                 }
-                if(j==0 || lab_env[i][j-1] == 0){
-                    left == 0;
+                if(j==0 || board[i][j-1] == 0){
+                    left = 0;
                 }
             }
         }
@@ -79,17 +117,12 @@ void possibleMoves(int board[10][10], action *action){
     //falta armazenar em ordem no array
 }
 
-//void exit(){
-    // reseta o estado do jogo
-//    printf("client disconnected");
-//}
-
 int main(int argc, char **argv) {
 
     // leitura do labirinto vindo do arquivo só um board
     int board[10][10]; // labirinto INICIAL do jogo
-    int jogado[10][10] = board; // labirinto com as coisas que o jogador já descobriu 
-    
+    int jogado[10][10]; // labirinto com as coisas que o jogador já descobriu 
+
     if (argc < 3) {
         usage(argc, argv);
     }
@@ -152,29 +185,67 @@ int main(int argc, char **argv) {
             memset(&buf, 0, sizeof(buf));
 
             //recebe mensagem do cliente
-            ssize_t count = recv(csock, &buf, sizeof(buf) - 1, 0);
+            size_t count = recv(csock, &buf, sizeof(buf) - 1, 0);
             printf("[msg] %s, %d bytes: %d\n", caddrstr, (int)count, buf.type);
             printf("a\n");
+            printf("msg type: %d", buf.type);
+
+            switch (buf.type)
+            {
+            case 0:
+                //start
+                start(board);
+                for(int i=0;i<10;i++){
+                    for(int j=0;j<10;j++){
+                        jogado[i][j] = board[i][j];
+                    }
+                }
+                break;
+            case 1:
+                //move
+                break;
+            case 2:
+                //map
+                break;
+            case 3:
+                //hint
+                break;
+            case 4:
+                //update
+                //isso tb n vai existir eu acho
+                break;
+            case 5:
+                //win
+                //isso nao vai existir eu acho
+                break;
+            case 6:
+                //reset
+                break;
+            case 7:
+                //exit
+                close(csock);
+                printf("client disconnected");
+                break;
+            }
 
             
 
             //sprintf(&buf, "remote endpoint: %.1000s\n", caddrstr);
             //printf("b\n");
 
-            //eh o buf que ele envia para o cliente
+            //eh o response que ele envia para o cliente
             action response;
+            response.type = 4;
 
-            //precisa de um update aqui no meio do caminho
+            //precisa ter um update aqui no meio do caminho
             
             count = send(csock, &response, sizeof(response) + 1, 0);
             printf("c\n");
-
             if (count != sizeof(response) + 1) {
                 logexit("send");
             }
 
         }
-        close(csock);
     }
 
     exit(EXIT_SUCCESS);
