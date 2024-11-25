@@ -276,19 +276,22 @@ int main(int argc, char **argv){
         //tratamento pós resposta do server
         switch(action.type){
             case 0:
+                startORmoveORreset(labServer);
                 break;
             case 1:
+                startORmoveORreset(labServer);
                 break;
             case 2:
                 map(labServer);
                 break;
             case 3:
                 break;
-            case 4:
-                break;
             case 5:
+                printf("You escaped!");
+                map(labServer);
                 break;
             case 6:
+                startORmoveORreset(labServer);
                 break;
             case 7:
                 break;
