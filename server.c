@@ -251,11 +251,47 @@ int main(int argc, char **argv) {
             case 0:
                 //start
                 start(board, path);
+                int ini_i = 0;
+                int ini_j = 0;
                 for(int i=0;i<10;i++){
                     for(int j=0;j<10;j++){
                         jogado[i][j] = 4;
+                        if(board[i][j]==2){
+                            jogado[i][j]=5;
+                            ini_i = i;
+                            ini_j = j;
+                        }
                     }
                 }
+                //mostra a linha de cima
+                if(ini_i!=0){
+                    jogado[ini_i-1][ini_j] = board[ini_i-1][ini_j];
+                    if(ini_j!=0){
+                        jogado[ini_i-1][ini_j-1] = board[ini_i-1][ini_j-1];
+                    }
+                    if(ini_j!=9){
+                        jogado[ini_i-1][ini_j+1] = board[ini_i-1][ini_j+1];
+                    }
+                }
+                //mostra linha de baixo
+                if(ini_i!=9){
+                    jogado[ini_i+1][ini_j] = board[ini_i+1][ini_j];
+                    if(ini_j!=0){
+                        jogado[ini_i+1][ini_j-1] = board[ini_i+1][ini_j-1];
+                    }
+                    if(ini_j!=9){
+                        jogado[ini_i+1][ini_j+1] = board[ini_i+1][ini_j+1];
+                    }
+                }
+                //mostra esquerda
+                if(ini_j!=0){
+                    jogado[ini_i][ini_j-1] = board[ini_i][ini_j-1];
+                }
+                //mostra direita
+                if(ini_j!=9){
+                    jogado[ini_i][ini_j+1] = board[ini_i][ini_j+1];
+                }
+
                 possibleMoves(&response, board, jogado);
                 break;
             case 1:
