@@ -87,9 +87,9 @@ void map(action action) {
         }
     }
 
-    for (int i = 0; i < 5; i++) {
-        for (int j = 0; j < 5; j++) {
-            printf("%s ", position[i][j]);
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            printf("%s \t", position[i][j]);
         }
         printf("\n");
     }
