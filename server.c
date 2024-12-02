@@ -51,6 +51,18 @@ void usage(int argc, char **argv) {
 void move(action action, int board[10][10]){
     // atualiza o estado do jogo
     // envia a lista de movimentos validos
+    //tem que chamar a funcao win
+    int jog_coluna = 0;
+    int jog_linha = 0;
+    for(int i=0;i<10;i++){
+        for(int j=0;j<10;j++){
+            if(jogado[i][j] == 5){
+                jog_coluna = i;
+                jog_linha = j;
+                break;
+            }
+        }
+    }
 }
 
 void map(action *action, int board[10][10]){
@@ -107,8 +119,25 @@ void update(action *action, int board[10][10]){
     action->type = 4;
 }
 
-void win(){
-
+void win(action action, int board[10][10], int jogado[10][10]){
+    int jog_coluna = 0;
+    int jog_linha = 0;
+    for(int i=0;i<10;i++){
+        for(int j=0;j<10;j++){
+            if(jogado[i][j] == 5){
+                jog_coluna = i;
+                jog_linha = j;
+                break;
+            }
+        }
+    }
+    
+    switch(action.moves[0]){
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+    }
 }
 
 void reset(){
