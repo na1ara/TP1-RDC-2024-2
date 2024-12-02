@@ -77,32 +77,32 @@ void move(action action, int board[10][10], int jogado[10][10]){
     
     //atualiza o tabuleiro com as novas posições visíveis
     //mostra a linha de cima
-    if(ini_i!=0){
-        jogado[ini_i-1][ini_j] = board[ini_i-1][ini_j];
-        if(ini_j!=0){
-            jogado[ini_i-1][ini_j-1] = board[ini_i-1][ini_j-1];
+    if(jog_coluna!=0){
+        jogado[jog_coluna-1][jog_linha] = board[jog_coluna-1][jog_linha];
+        if(jog_linha!=0){
+            jogado[jog_coluna-1][jog_linha-1] = board[jog_coluna-1][jog_linha-1];
         }
-        if(ini_j!=9){
-            jogado[ini_i-1][ini_j+1] = board[ini_i-1][ini_j+1];
+        if(jog_linha!=9){
+            jogado[jog_coluna-1][jog_linha+1] = board[jog_coluna-1][jog_linha+1];
         }
     }
     //mostra linha de baixo
-    if(ini_i!=9){
-        jogado[ini_i+1][ini_j] = board[ini_i+1][ini_j];
-        if(ini_j!=0){
-            jogado[ini_i+1][ini_j-1] = board[ini_i+1][ini_j-1];
+    if(jog_coluna!=9){
+        jogado[jog_coluna+1][jog_linha] = board[jog_coluna+1][jog_linha];
+        if(jog_linha!=0){
+            jogado[jog_coluna+1][jog_linha-1] = board[jog_coluna+1][jog_linha-1];
         }
-        if(ini_j!=9){
-            jogado[ini_i+1][ini_j+1] = board[ini_i+1][ini_j+1];
+        if(jog_linha!=9){
+            jogado[jog_coluna+1][jog_linha+1] = board[jog_coluna+1][jog_linha+1];
         }
     }
     //mostra esquerda
-    if(ini_j!=0){
-        jogado[ini_i][ini_j-1] = board[ini_i][ini_j-1];
+    if(jog_linha!=0){
+        jogado[jog_coluna][jog_linha-1] = board[jog_coluna][jog_linha-1];
     }
     //mostra direita
-    if(ini_j!=9){
-        jogado[ini_i][ini_j+1] = board[ini_i][ini_j+1];
+    if(jog_linha!=9){
+        jogado[jog_coluna][jog_linha+1] = board[jog_coluna][jog_linha+1];
     }
 
     
