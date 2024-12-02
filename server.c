@@ -48,12 +48,10 @@ void usage(int argc, char **argv) {
     exit(EXIT_FAILURE);
 }
 
-void move(action action, int board[10][10]){
-    // atualiza o estado do jogo
-    // envia a lista de movimentos validos
-    //tem que chamar a funcao win
+void move(action action, int board[10][10], int jogado[10][10]){
     int jog_coluna = 0;
     int jog_linha = 0;
+    //acha primeiro o jogador
     for(int i=0;i<10;i++){
         for(int j=0;j<10;j++){
             if(jogado[i][j] == 5){
@@ -63,6 +61,51 @@ void move(action action, int board[10][10]){
             }
         }
     }
+    //tem que fazer a mudança da posição
+    jogado[jog_coluna][jog_linha] = board[jog_coluna][jog_linha];
+    switch(action.moves[0]){
+        case 1:
+        jogado[jog_coluna][jog_linha-1]=5;
+        case 2:
+        jogado[jog_coluna+1][jog_linha]=5;
+        case 3:
+        jogado[jog_coluna][jog_linha+1]=5;
+        case 4:
+        jogado[jog_coluna-1][jog_linha]=5;
+    }
+    
+    
+    //atualiza o tabuleiro com as novas posições visíveis
+    //mostra a linha de cima
+    if(ini_i!=0){
+        jogado[ini_i-1][ini_j] = board[ini_i-1][ini_j];
+        if(ini_j!=0){
+            jogado[ini_i-1][ini_j-1] = board[ini_i-1][ini_j-1];
+        }
+        if(ini_j!=9){
+            jogado[ini_i-1][ini_j+1] = board[ini_i-1][ini_j+1];
+        }
+    }
+    //mostra linha de baixo
+    if(ini_i!=9){
+        jogado[ini_i+1][ini_j] = board[ini_i+1][ini_j];
+        if(ini_j!=0){
+            jogado[ini_i+1][ini_j-1] = board[ini_i+1][ini_j-1];
+        }
+        if(ini_j!=9){
+            jogado[ini_i+1][ini_j+1] = board[ini_i+1][ini_j+1];
+        }
+    }
+    //mostra esquerda
+    if(ini_j!=0){
+        jogado[ini_i][ini_j-1] = board[ini_i][ini_j-1];
+    }
+    //mostra direita
+    if(ini_j!=9){
+        jogado[ini_i][ini_j+1] = board[ini_i][ini_j+1];
+    }
+
+    
 }
 
 void map(action *action, int board[10][10]){
@@ -119,7 +162,7 @@ void update(action *action, int board[10][10]){
     action->type = 4;
 }
 
-void win(action action, int board[10][10], int jogado[10][10]){
+void win(int board[10][10], int jogado[10][10], int *win){
     int jog_coluna = 0;
     int jog_linha = 0;
     for(int i=0;i<10;i++){
@@ -131,12 +174,8 @@ void win(action action, int board[10][10], int jogado[10][10]){
             }
         }
     }
-    
-    switch(action.moves[0]){
-        case 1:
-        case 2:
-        case 3:
-        case 4:
+    if(board[jog_coluna][jog_linha]==3){
+        win = 1;
     }
 }
 
@@ -260,6 +299,7 @@ int main(int argc, char **argv) {
         addrtostr(caddr, caddrstr, BUFSZ);
         
         action buf; //mensagem recebida vinda do cliente
+        int win=0;
         while(1){
             printf(".\n");
             //char buf[BUFSZ];
@@ -325,7 +365,8 @@ int main(int argc, char **argv) {
                 break;
             case 1:
                 //move
-                move(buf, jogado);
+                move(buf, board, jogado);
+                win(board, jogado, win);
                 possibleMoves(&response, board, jogado);
                 break;
             case 2:
