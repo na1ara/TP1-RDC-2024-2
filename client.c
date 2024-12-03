@@ -22,7 +22,11 @@ void usage(int argc, char **argv){
 void startORmoveORreset(action action){
     // testar quais são os movimentos permitidos
     //set aux variables to tell which moves are possible
-    printf("Possible moves: ");
+    //printf("vetor que chega:");
+    //for(int j=0;j<100;j++){
+    //    printf("%d", action.moves[j]);
+    //}
+    printf("\nPossible moves: ");
     for(int i=0; i<100;i++){
         if(action.moves[i+1] != 0){
             switch (action.moves[i]){
@@ -42,16 +46,16 @@ void startORmoveORreset(action action){
         }else{
             switch (action.moves[i]){
             case 1:
-                printf("up.");
+                printf("up.\n");
                 break;
             case 2:
-                printf("right.");
+                printf("right.\n");
                 break;
             case 3:
-                printf("down.");
+                printf("down.\n");
                 break;
             case 4:
-                printf("left.");
+                printf("left.\n");
                 break;
             }
         }
@@ -116,25 +120,25 @@ void hint(action action){
         }else{
             switch (action.moves[i]){
             case 1:
-                printf("up.");
+                printf("up.\n");
                 break;
             case 2:
-                printf("right.");
+                printf("right.\n");
                 break;
             case 3:
-                printf("down.");
+                printf("down.\n");
                 break;
             case 4:
-                printf("left.");
+                printf("left.\n");
                 break;
             }
+        return;
         }
+        break;
+        return;
     }
 }
 
-void invalidMove(action action){
-
-}
 
 int main(int argc, char **argv){
     if(argc < 3){
@@ -174,7 +178,6 @@ int main(int argc, char **argv){
     while(1){
         // comunicação cliente-servidor
         //pega novo comando do cliente
-        printf(".\n");
         memset(&buf, 0, sizeof(buf));
 
         if(action.type<0){
@@ -194,68 +197,74 @@ int main(int argc, char **argv){
             }
             action.type = 0;
         }else{
-            printf("mensagem de comando> ");
-            // dado enviado para o servidor
-	        fgets(buf, BUFSZ-1, stdin);
-            strncpy(command, buf, BUFSZ); 
-            command[strcspn(command, "\n")] = '\0';
-
             int ok=0;
-            if (strcmp(command, "up") == 0){
-                for(int i=0;i<4;i++){
-                    if(labServer.moves[i]==1){
-                        ok=1;
+            while (ok==0){
+                printf("mensagem de comando> ");
+                // dado enviado para o servidor
+	            fgets(buf, BUFSZ-1, stdin);
+                strncpy(command, buf, BUFSZ); 
+                command[strcspn(command, "\n")] = '\0';
+            
+                if (strcmp(command, "up") == 0){
+                    for(int i=0;i<4;i++){
+                        if(labServer.moves[i]==1){
+                            ok=1;
+                            action.type = 1;
+                            action.moves[0] = 1;
+                        }
                     }
-                }
-                if(ok==0){
-                    invalidMove(labServer);
-                }
-                action.type = 1;
-                action.moves[0] = 1;
-            }else if (strcmp(command, "right") == 0){
-                for(int i=0;i<4;i++){
-                    if(labServer.moves[i]==2){
-                        ok=1;
+                    if(ok==0){
+                        printf("error: you cannot go this way\n");
                     }
-                }
-                if(ok==0){
-                    invalidMove(labServer);
-                }
-                action.type = 1;
-                action.moves[0] = 2;
-            }else if (strcmp(command, "down") == 0){
-                for(int i=0;i<4;i++){
-                    if(labServer.moves[i]==3){
-                        ok=1;
+                }else if (strcmp(command, "right") == 0){
+                    for(int i=0;i<4;i++){
+                        if(labServer.moves[i]==2){
+                            ok=1;
+                            action.type = 1;
+                            action.moves[0] = 2;
+                        }
                     }
-                }
-                if(ok==0){
-                    invalidMove(labServer);
-                }
-                action.type = 1;
-                action.moves[0] = 3;
-            }else if (strcmp(command, "left") == 0){
-                for(int i=0;i<4;i++){
-                    if(labServer.moves[i]==4){
-                        ok=1;
+                    if(ok==0){
+                        printf("error: you cannot go this way\n");
                     }
+                }else if (strcmp(command, "down") == 0){
+                    for(int i=0;i<4;i++){
+                        if(labServer.moves[i]==3){
+                            ok=1;
+                            action.type = 1;
+                            action.moves[0] = 3;
+                        }
+                    }
+                    if(ok==0){
+                        printf("error: you cannot go this way\n");
+                    }
+                }else if (strcmp(command, "left") == 0){
+                    for(int i=0;i<4;i++){
+                        if(labServer.moves[i]==4){
+                            ok=1;
+                            action.type = 1;
+                            action.moves[0] = 4;
+                        }
+                    }
+                    if(ok==0){
+                        printf("error: you cannot go this way\n");
+                    }
+                }else if (strcmp(command, "map") == 0){
+                    action.type = 2;
+                    ok = 1;
+                }else if (strcmp(command, "hint") == 0){
+                    action.type = 3;
+                    ok = 1;
+                }else if (strcmp(command, "reset") == 0){
+                    action.type = 6;
+                    ok = 1;
+                }else if (strcmp(command, "exit") == 0){
+                    action.type = 7;
+                    ok = 1;
+                    close(s);
+                }else{
+                    printf("error: command not found\n");
                 }
-                if(ok==0){
-                    invalidMove(labServer);
-                }
-                action.type = 1;
-                action.moves[0] = 4;
-            }else if (strcmp(command, "map") == 0){
-                action.type = 2;
-            }else if (strcmp(command, "hint") == 0){
-                action.type = 3;
-            }else if (strcmp(command, "reset") == 0){
-                action.type = 6;
-            }else if (strcmp(command, "exit") == 0){
-                action.type = 7;
-                close(s);
-            }else{
-                printf("error: command not found\n");
             }
         }
 
