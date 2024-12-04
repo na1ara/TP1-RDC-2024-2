@@ -342,6 +342,8 @@ int main(int argc, char **argv) {
             //printf("a\n");
             printf("msg type: %d\n", buf.type);
             action response;
+            //eh o response que ele envia para o cliente
+            response.type = 4;
 
             switch (buf.type)
             {
@@ -395,6 +397,10 @@ int main(int argc, char **argv) {
                 //move
                 move(buf, board, jogado);
                 ganhou = win(board, jogado);
+                if(ganhou==1){
+                    response.type = 5;
+                    map(&response, board);
+                }
                 possibleMoves(&response, board, jogado);
                 break;
             case 2:
@@ -403,14 +409,6 @@ int main(int argc, char **argv) {
                 break;
             case 3:
                 //hint
-                break;
-            case 4:
-                //update
-                //isso tb n vai existir eu acho
-                break;
-            case 5:
-                //win
-                //isso nao vai existir eu acho
                 break;
             case 6:
                 //reset
@@ -427,13 +425,10 @@ int main(int argc, char **argv) {
             //sprintf(&buf, "remote endpoint: %.1000s\n", caddrstr);
             //printf("b\n");
 
-            //eh o response que ele envia para o cliente
-            response.type = 4;
 
             //precisa ter um update aqui no meio do caminho
             
             count = send(csock, &response, sizeof(response), 0);
-            printf("c\n");
             if (count != sizeof(response)) {
                 logexit("send");
             }
