@@ -140,6 +140,7 @@ void hint(action *action, int board[10][10], int jogado[10][10]){
     // envia lista de movimentos
     // tem que chamar o possible moves algumas vezes
     int win = 0;
+    int qntd_mov = 0;
     while(win==0){
         char moves[4];
         for(int n=0;n<4;n++){
@@ -170,15 +171,16 @@ void hint(action *action, int board[10][10], int jogado[10][10]){
         }
 
         //procura sempre pela parede da direita
-        //ou seja, right->
+        for(int k=3;k==0;k--){
+            if (moves[k] ==1){
+                action->moves[qntd_mov] = moves[k];
+                break;
+            }
+            
+        }
+        qntd_mov++;
     }
 
-}
-
-void update(action *action, int board[10][10]){
-    //atualizar o labirinto a ser enviado
-    //recursivo da possibleMoves e vai guardando o mais a direita que pode
-    action->type = 4;
 }
 
 int win(int board[10][10], int jogado[10][10]){
@@ -258,6 +260,9 @@ void possibleMoves(action *action, int board[10][10], int jogado[10][10]){
 int main(int argc, char **argv) {
 
     // leitura do labirinto vindo do arquivo só um board
+    int colunas = 0;
+    int linhas = 0;
+
     int board[10][10]; // labirinto INICIAL do jogo
     int jogado[10][10]; // labirinto com as coisas que o jogador já descobriu 
 
@@ -404,6 +409,7 @@ int main(int argc, char **argv) {
                 break;
             case 3:
                 //hint
+                hint(&response, board, jogado);
                 break;
             case 6:
                 //reset
@@ -457,14 +463,6 @@ int main(int argc, char **argv) {
                 printf("client disconnected");
                 break;
             }
-
-            
-
-            //sprintf(&buf, "remote endpoint: %.1000s\n", caddrstr);
-            //printf("b\n");
-
-
-            //precisa ter um update aqui no meio do caminho
             
             count = send(csock, &response, sizeof(response), 0);
             if (count != sizeof(response)) {

@@ -320,6 +320,7 @@ int main(int argc, char **argv){
                     map(labServer);
                     break;
                 case 3:
+                    hint(labServer);
                     break;
                 case 6:
                     startORmoveORreset(labServer);
