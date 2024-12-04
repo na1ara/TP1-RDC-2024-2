@@ -19,7 +19,7 @@ void start(int board[10][10], char *path){
 
     for (int i=0;i<10;i++){
         for (int j=0;j<10;j++){
-            board[i][j] = 0; //inicializa tudo como muro
+            board[i][j] = 9; //inicializa tudo como muro
         }
     }
 
@@ -139,9 +139,17 @@ void map(action *action, int board[10][10]){
 void hint(action *action, int board[10][10], int jogado[10][10]){
     // envia lista de movimentos
     // tem que chamar o possible moves algumas vezes
-    int win = 0;
+    int ganhou = 0;
     int qntd_mov = 0;
-    while(win==0){
+    int jog_coluna = 0;
+    int jog_linha = 0;
+    int caminho_hint[10][10];
+    for(int y=0;y<10;y++){
+        for(int z=0;z<10;z++){
+            caminho_hint[y][z]=jogado[y][z];
+        }
+    }
+    while(ganhou==0){
         char moves[4];
         for(int n=0;n<4;n++){
             moves[n] = 1; //inicializa podendo tudo
@@ -149,20 +157,22 @@ void hint(action *action, int board[10][10], int jogado[10][10]){
 
         for(int i=0; i<10;i++){
             for(int j=0; j<10;j++){
-                if(jogado[i][j]==5){ //acha o jogador
-                    if(i==0 || board[i-1][j] == 0 ){
+                if(caminho_hint[i][j]==5){ //acha o jogador
+                    jog_linha = i;
+                    jog_coluna = j;
+                    if(i==0 || board[i-1][j] == 0 || board[i-1][j] == 9){
                         //se primeira linha ou de cima eh muro, up nao pode
                         moves[0] = 0; //up
                     }
-                    if(j==9 || board[i][j+1] == 0){
+                    if(j==9 || board[i][j+1] == 0 || board[i][j+1] == 9){
                         //se ultima coluna ou coluna do lado eh muro, rught nao pode
                         moves[1] = 0; //right
                     }
-                    if(i==9 || board[i+1][j] == 0){
+                    if(i==9 || board[i+1][j] == 0 || board[i+1][j] == 9){
                         //se ultima linha ou linha debaixo eh muro, down nao pode
                         moves[2] = 0; //down
                     }
-                    if(j==0 || board[i][j-1] == 0){
+                    if(j==0 || board[i][j-1] == 0 || board[i][j-1] == 9){
                         //se primeira coluna ou coluna anteriore eh muro, left nao pode
                         moves[3] = 0; //left
                     }
@@ -171,12 +181,36 @@ void hint(action *action, int board[10][10], int jogado[10][10]){
         }
 
         //procura sempre pela parede da direita
-        for(int k=3;k==0;k--){
+        for(int k=0;k<4;k++){
             if (moves[k] ==1){
                 action->moves[qntd_mov] = moves[k];
+                caminho_hint[jog_linha][jog_coluna] = board[jog_linha][jog_coluna];
+                //mesmo esquema do move
+                switch(moves[k]){
+                    case 1:
+                        caminho_hint[jog_linha-1][jog_coluna]=5;
+                        jog_coluna-=1;
+                        //printf("cima");
+                        break;
+                    case 2:
+                        caminho_hint[jog_linha][jog_coluna+1]=5;
+                        jog_coluna+=1;
+                        //printf("direita");
+                        break;
+                    case 3:
+                        caminho_hint[jog_linha+1][jog_coluna]=5;
+                        jog_linha+=1;
+                        //printf("baixo");
+                        break;
+                    case 4:
+                        caminho_hint[jog_linha][jog_coluna-1]=5;
+                        jog_coluna-=1;
+                        //printf("esquerda");
+                        break;
+                 }
                 break;
             }
-            
+            ganhou = win(board, caminho_hint)
         }
         qntd_mov++;
     }
@@ -217,19 +251,19 @@ void possibleMoves(action *action, int board[10][10], int jogado[10][10]){
     for(int i=0; i<10;i++){
         for(int j=0; j<10;j++){
             if(jogado[i][j]==5){ //acha o jogador
-                if(i==0 || board[i-1][j] == 0 ){
+                if(i==0 || board[i-1][j] == 0 || board[i-1][j] == 9){
                     //se primeira linha ou de cima eh muro, up nao pode
                     pmoves[0] = 0; //up
                 }
-                if(j==9 || board[i][j+1] == 0){
+                if(j==9 || board[i][j+1] == 0 || board[i][j+1] == 9){
                     //se ultima coluna ou coluna do lado eh muro, rught nao pode
                     pmoves[1] = 0; //right
                 }
-                if(i==9 || board[i+1][j] == 0){
+                if(i==9 || board[i+1][j] == 0 || board[i+1][j] == 9){
                     //se ultima linha ou linha debaixo eh muro, down nao pode
                     pmoves[2] = 0; //down
                 }
-                if(j==0 || board[i][j-1] == 0){
+                if(j==0 || board[i][j-1] == 0 || board[i][j-1] == 9){
                     //se primeira coluna ou coluna anteriore eh muro, left nao pode
                     pmoves[3] = 0; //left
                 }
@@ -258,10 +292,6 @@ void possibleMoves(action *action, int board[10][10], int jogado[10][10]){
 }
 
 int main(int argc, char **argv) {
-
-    // leitura do labirinto vindo do arquivo só um board
-    int colunas = 0;
-    int linhas = 0;
 
     int board[10][10]; // labirinto INICIAL do jogo
     int jogado[10][10]; // labirinto com as coisas que o jogador já descobriu 
