@@ -25,25 +25,12 @@ void start(int board[10][10], char *path){
 
     int i=0;
     int j=0;
-    char linha[256];
-    //while (!feof(arq)){
-    //   int num;
-    //    if (fscanf(arq, "%d", &num) == 1){ //pega apenas num inteiros
-    //        board[i][j] = num;
-    //       j++;
-    //        if (j>=10){ //pula p prox linha
-    //            j = 0;
-    //            i++;
-    //        }
-    //       if (i>=10){ //pega só o max de colunas
-    //            break;
-    //        }
-    //    }
-    //}
-    while (fgets(linha, sizeof(linha), arq) && i < 10) {
-        char *token = strtok(linha, " \t\n"); // Divide a linha por espaços, tabulações ou quebras de linha
+    char fila[256];
+
+    while (fgets(fila, sizeof(fila), arq) && i < 10) {
+        char *token = strtok(fila, " \t\n");
         while (token != NULL && j < 10) {
-            board[i][j] = atoi(token); // Converte o token para número e adiciona à matriz
+            board[i][j] = atoi(token);
             j++;
             token = strtok(NULL, " \t\n");
         }
@@ -195,7 +182,7 @@ void hint(action *action, int board[10][10], int jogado[10][10]){
         //procura sempre pela parede da direita
         for(int k=0;k<4;k++){
             if (moves[k] ==1){
-                action->moves[qntd_mov] = moves[k];
+                action->moves[qntd_mov] = k+1;
                 caminho_hint[jog_linha][jog_coluna] = board[jog_linha][jog_coluna];
                 //mesmo esquema do move
                 switch(moves[k]){
@@ -222,7 +209,7 @@ void hint(action *action, int board[10][10], int jogado[10][10]){
                  }
                 break;
             }
-            ganhou = win(board, caminho_hint)
+            ganhou = win(board, caminho_hint);
         }
         qntd_mov++;
     }
@@ -401,6 +388,8 @@ int main(int argc, char **argv) {
                             jogado[i][j]=5;
                             ini_i = i;
                             ini_j = j;
+                        }else if(board[i][j]==9){
+                            jogado[i][j]=9;
                         }
                     }
                 }

@@ -26,7 +26,7 @@ void startORmoveORreset(action action){
     //for(int j=0;j<100;j++){
     //    printf("%d", action.moves[j]);
     //}
-    printf("\nPossible moves: ");
+    printf("Possible moves: ");
     for(int i=0; i<100;i++){
         if(action.moves[i+1] != 0){
             switch (action.moves[i]){
@@ -87,18 +87,26 @@ void map(action action) {
                 case 5:
                     strcpy(position[i][j], "+");
                     break;
-		case 9:
-		strcpy(position[i][j], "");
-		    break;
+		        case 9:
+		            strcpy(position[i][j], "y");
+		            break;
             }
         }
     }
 
     for (int i = 0; i < 10; i++) {
         for (int j = 0; j < 10; j++) {
-            printf("%s \t", position[i][j]);
+            if(action.board[i][j]!=9){
+                if(action.board[i][j+1]==9){
+                    printf("%s", position[i][j]);
+                }else{
+                    printf("%s \t", position[i][j]);
+                }
+            }
         }
+        if(action.board[i+1][0]!=9){
         printf("\n");
+        }
     }
 }
 
