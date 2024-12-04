@@ -23,20 +23,32 @@ void start(int board[10][10], char *path){
         }
     }
 
-    int i=0, j=0;
-    while (!feof(arq)){
-        int num;
-        if (fscanf(arq, "%d", &num) == 1){ //pega apenas num inteiros
-            board[i][j] = num;
+    int i=0;
+    int j=0;
+    char linha[256];
+    //while (!feof(arq)){
+    //   int num;
+    //    if (fscanf(arq, "%d", &num) == 1){ //pega apenas num inteiros
+    //        board[i][j] = num;
+    //       j++;
+    //        if (j>=10){ //pula p prox linha
+    //            j = 0;
+    //            i++;
+    //        }
+    //       if (i>=10){ //pega só o max de colunas
+    //            break;
+    //        }
+    //    }
+    //}
+    while (fgets(linha, sizeof(linha), arq) && i < 10) {
+        char *token = strtok(linha, " \t\n"); // Divide a linha por espaços, tabulações ou quebras de linha
+        while (token != NULL && j < 10) {
+            board[i][j] = atoi(token); // Converte o token para número e adiciona à matriz
             j++;
-            if (j>=10){ //pula p prox linha
-                j = 0;
-                i++;
-            }
-            if (i>=10){ //pega só o max de colunas
-                break;
-            }
+            token = strtok(NULL, " \t\n");
         }
+        i++;
+        j=0;
     }
     fclose(arq);
     //for(int i=0;i<10;i++){
