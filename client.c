@@ -165,7 +165,7 @@ int main(int argc, char **argv){
 	char addrstr[BUFSZ];
 	addrtostr(addr, addrstr, BUFSZ);
 
-    printf("connected to %s\n", addrstr);
+    //printf("connected to %s\n", addrstr);
 
     action action, labServer;
     action.type = -1;
@@ -173,15 +173,17 @@ int main(int argc, char **argv){
     
     char buf[BUFSZ];
     char command[BUFSZ];
+    int acaboudeganhar = 0;
+    int client_exit = 0;
 	
     // começa o jogo
-    while(1){
+    while(client_exit == 0){
         // comunicação cliente-servidor
         //pega novo comando do cliente
         memset(&buf, 0, sizeof(buf));
 
         if(action.type<0){
-            printf("mensagem de start> ");
+            printf("> ");
             fgets(buf, BUFSZ-1, stdin);
             strncpy(command, buf, BUFSZ); 
             command[strcspn(command, "\n")] = '\0';
@@ -189,17 +191,37 @@ int main(int argc, char **argv){
             while(strcmp(command, "start") != 0){
                 printf("error: start the game first\n");
                 memset(buf, 0, BUFSZ);
-                printf("mensagem de start> ");
+                printf("> ");
                 // dado enviado para o servidor
 	            fgets(buf, BUFSZ-1, stdin);
                 strncpy(command, buf, BUFSZ); 
                 command[strcspn(command, "\n")] = '\0';
             }
             action.type = 0;
+        }else if (acaboudeganhar==1){
+            printf("> ");
+            fgets(buf, BUFSZ-1, stdin);
+            strncpy(command, buf, BUFSZ); 
+            command[strcspn(command, "\n")] = '\0';
+            //testa pro primeiro ser obrigatoriamente um start
+            while(strcmp(command, "reset") != 0 && strcmp(command, "exit") != 0){
+                memset(buf, 0, BUFSZ);
+                printf("> ");
+                // dado enviado para o servidor
+	            fgets(buf, BUFSZ-1, stdin);
+                strncpy(command, buf, BUFSZ); 
+                command[strcspn(command, "\n")] = '\0';
+            }
+            acaboudeganhar = 0;
+            if(strcmp(command, "reset") == 0){
+                action.type = 6;
+            }else if(strcmp(command, "exit") == 0){
+                action.type = 7;
+            }
         }else{
             int ok=0;
             while (ok==0){
-                printf("mensagem de comando> ");
+                printf("> ");
                 // dado enviado para o servidor
 	            fgets(buf, BUFSZ-1, stdin);
                 strncpy(command, buf, BUFSZ); 
@@ -261,31 +283,31 @@ int main(int argc, char **argv){
                 }else if (strcmp(command, "exit") == 0){
                     action.type = 7;
                     ok = 1;
-                    close(s);
                 }else{
                     printf("error: command not found\n");
                 }
             }
         }
 
-        printf("action type: %d\n", action.type);
-        printf("comando selecionado ok\n");
+        //printf("action type: %d\n", action.type);
+        //printf("comando selecionado ok\n");
         count = send(s, &action, sizeof(action), 0); //n de bits transmitido na rede
 	    if (count != sizeof(action)) {
 	    	logexit("send");
 	    }
-        printf("mensagem transmitida\n");
+        //printf("mensagem transmitida\n");
 
         memset(&labServer, 0, sizeof(labServer));
         count = recv(s, &labServer, sizeof(labServer), 0);
 
-        printf("response type: %d\n", labServer.type);
-        puts(buf);
+        //printf("response type: %d\n", labServer.type);
+        //puts(buf);
 
         //tratamento pós resposta do server
         if(labServer.type==5){
             printf("You escaped!\n");
             map(labServer);
+            acaboudeganhar = 1;
         }else{
             switch(action.type){
                 case 0:
@@ -303,6 +325,8 @@ int main(int argc, char **argv){
                     startORmoveORreset(labServer);
                     break;
                 case 7:
+                    client_exit = 1;
+                    close(s);
                     break;
             }
         }

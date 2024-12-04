@@ -39,19 +39,19 @@ void start(int board[10][10], char *path){
         }
     }
     fclose(arq);
-    for(int i=0;i<10;i++){
-        for(int j=0;j<10;j++){
-            printf("%d ", board[i][j]);
-        }
-        printf("\n");
-    }
+    //for(int i=0;i<10;i++){
+    //    for(int j=0;j<10;j++){
+    //        printf("%d ", board[i][j]);
+    //    }
+    //    printf("\n");
+    //}
 
     printf("starting new game\n");
 }
 
 void usage(int argc, char **argv) {
-    printf("usage: %s <v4|v6> <server port> -i <path to lab>\n", argv[0]);
-    printf("example: %s v4 51511\n", argv[0]);
+    //printf("usage: %s <v4|v6> <server port> -i <path to lab>\n", argv[0]);
+    //printf("example: %s v4 51511\n", argv[0]);
     exit(EXIT_FAILURE);
 }
 
@@ -74,22 +74,22 @@ void move(action action, int board[10][10], int jogado[10][10]){
         case 1:
             jogado[jog_linha-1][jog_coluna]=5;
             jog_coluna-=1;
-            printf("cima");
+            //printf("cima");
             break;
         case 2:
             jogado[jog_linha][jog_coluna+1]=5;
             jog_coluna+=1;
-            printf("direita");
+            //printf("direita");
             break;
         case 3:
             jogado[jog_linha+1][jog_coluna]=5;
             jog_linha+=1;
-            printf("baixo");
+            //printf("baixo");
             break;
         case 4:
             jogado[jog_linha][jog_coluna-1]=5;
             jog_coluna-=1;
-            printf("esquerda");
+            //printf("esquerda");
             break;
     }
     
@@ -200,11 +200,6 @@ int win(int board[10][10], int jogado[10][10]){
     }
 }
 
-void reset(){
-    // reseta o estado do jogo
-    printf("starting new game\n");
-}
-
 void possibleMoves(action *action, int board[10][10], int jogado[10][10]){
     //precisa ler o tabuleiro e dizer pra onde pode ir
 
@@ -254,10 +249,10 @@ void possibleMoves(action *action, int board[10][10], int jogado[10][10]){
             marked++;
         }
     }
-    for(int z=0;z<4;z++){
-        printf("%d", action->moves[z]);
-        printf(" ");
-    }
+    //for(int z=0;z<4;z++){
+    //    printf("%d", action->moves[z]);
+    //    printf(" ");
+    //}
 }
 
 int main(int argc, char **argv) {
@@ -329,7 +324,7 @@ int main(int argc, char **argv) {
         action buf; //mensagem recebida vinda do cliente
         int ganhou=0;
         while(1){
-            printf(".\n");
+            //printf(".\n");
             //char buf[BUFSZ];
             //memset(buf, 0, BUFSZ);
             memset(&buf, 0, sizeof(buf));
@@ -338,9 +333,9 @@ int main(int argc, char **argv) {
             size_t count;
             count = recv(csock, &buf, sizeof(buf),0);
             
-            printf("[msg] %s, %d bytes: %d\n", caddrstr, (int)count, buf.type);
+            //printf("[msg] %s, %d bytes: %d\n", caddrstr, (int)count, buf.type);
             //printf("a\n");
-            printf("msg type: %d\n", buf.type);
+            //printf("msg type: %d\n", buf.type);
             action response;
             //eh o response que ele envia para o cliente
             response.type = 4;
@@ -412,6 +407,49 @@ int main(int argc, char **argv) {
                 break;
             case 6:
                 //reset
+                start(board, path);
+                ini_i = 0;
+                ini_j = 0;
+                for(int i=0;i<10;i++){
+                    for(int j=0;j<10;j++){
+                        jogado[i][j] = 4;
+                        if(board[i][j]==2){
+                            jogado[i][j]=5;
+                            ini_i = i;
+                            ini_j = j;
+                        }
+                    }
+                }
+                //mostra a linha de cima
+                if(ini_i!=0){
+                    jogado[ini_i-1][ini_j] = board[ini_i-1][ini_j];
+                    if(ini_j!=0){
+                        jogado[ini_i-1][ini_j-1] = board[ini_i-1][ini_j-1];
+                    }
+                    if(ini_j!=9){
+                        jogado[ini_i-1][ini_j+1] = board[ini_i-1][ini_j+1];
+                    }
+                }
+                //mostra linha de baixo
+                if(ini_i!=9){
+                    jogado[ini_i+1][ini_j] = board[ini_i+1][ini_j];
+                    if(ini_j!=0){
+                        jogado[ini_i+1][ini_j-1] = board[ini_i+1][ini_j-1];
+                    }
+                    if(ini_j!=9){
+                        jogado[ini_i+1][ini_j+1] = board[ini_i+1][ini_j+1];
+                    }
+                }
+                //mostra esquerda
+                if(ini_j!=0){
+                    jogado[ini_i][ini_j-1] = board[ini_i][ini_j-1];
+                }
+                //mostra direita
+                if(ini_j!=9){
+                    jogado[ini_i][ini_j+1] = board[ini_i][ini_j+1];
+                }
+
+                possibleMoves(&response, board, jogado);
                 break;
             case 7:
                 //exit
