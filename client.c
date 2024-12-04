@@ -87,6 +87,9 @@ void map(action action) {
                 case 5:
                     strcpy(position[i][j], "+");
                     break;
+		case 9:
+		strcpy(position[i][j], "");
+		    break;
             }
         }
     }
